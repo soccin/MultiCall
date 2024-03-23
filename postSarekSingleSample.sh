@@ -22,7 +22,7 @@ PID=${NORMAL%%;*}
 TID=${TUMOR##$PID;}
 NID=${NORMAL##$PID;}
 
-exec >> post_${PID}_${NID}.log
+exec >> ${PID}_${NID}.log
 exec 2>&1
 
 echo PID=$PID
@@ -70,4 +70,4 @@ wait
 
 Rscript mergeMAFs.R $ODIR/*.vep.maf
 
-echo $INPUTCSV DONE
+echo DONE $INPUTCSV
