@@ -8,7 +8,7 @@ VEP_DATA=$VEPROOT/vep_data
 
 if [ ! -e $VEP_IMAGE ]; then
     echo -e "\n\n   Need to install VEP Stuff\n" >&2
-    echo "   "See $SDIR/../resources/vep/CMDS.INSTALL >&2
+    echo "   "See $(realpath $SDIR/../resources/vep/CMDS.INSTALL) >&2
     echo >&2
     exit 1
 fi
