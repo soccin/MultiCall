@@ -4,9 +4,9 @@ module load samtools/1.19.2
 
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
 
-MROOT=$SDIR/../resources/
+MROOT=$(realpath $SDIR/../resources)
 VEPROOT=$MROOT/vep
-VEPDATA=
+VEPDATA=$MROOT/vep/vep_data
 
 VCF2MAF=$MROOT/vcf2maf-1.6.21/vcf2maf.pl
 
@@ -15,7 +15,7 @@ NID=$2
 TID=$3
 
 perl $VCF2MAF \
-    --vep-path $VEPROOT/bin \
+    --vep-path $SDIR \
     --vep-data $VEPDATA \
     --vep-forks 12  \
     --ref-fasta $VEPDATA/mus_musculus/102_GRCm38/Mus_musculus.GRCm38.dna.toplevel.fa.gz \

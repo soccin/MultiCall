@@ -1,0 +1,17 @@
+#!/bin/bash
+
+SDIR="$( cd "$( dirname "$0" )" && pwd )"
+
+VEPROOT=$SDIR/../resources/vep
+VEP_IMAGE=$VEPROOT/vep-102.sif
+VEP_DATA=$VEPROOT/vep_data
+
+if [ ! -e $VEP_IMAGE ]; then
+    echo -e "\n\n   Need to install VEP Stuff\n" >&2
+    echo "   "See $SDIR/../resources/vep/CMDS.INSTALL >&2
+    echo >&2
+    exit 1
+fi
+
+singularity exec -B /juno,/rtsess01,$VEP_DATA:/data $VEP_IMAGE vep "$@"
+

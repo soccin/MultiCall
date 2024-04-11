@@ -5,13 +5,25 @@ set -eu
 module load bcftools/1.19
 module load bedtools/2.31.1
 
+
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
 export PATH=$SDIR/bin:$PATH
+
+VEPVERSION=$(vep --help | fgrep ensembl-vep | awk '{print $3}')
+
+if [ "$VEPVERSION" != "102.0" ]; then
+    echo -e "\n\n   vep not properly installed; see instructions\n"
+    echo -e "VEPVERSION=[${VEPVERSION}]\n\n"
+    exit 1
+fi
+
 
 TARGET_BED=$SDIR/targets/M-IMPACT_v2_mm10_targets_plus15bp.bed
 
 if [ "$#" != "4" ]; then
-    echo -e "\n\n   usage: postSarekPair.sh VAR_CALL_DIR PID NID TID\n\n"
+    echo -e "\n\n
+      usage: postSarekPair.sh VAR_CALL_DIR PID NID TID\n"
+    echo -e "        VEPVERSION=[${VEPVERSION}]\n\n"
     exit
 fi
 

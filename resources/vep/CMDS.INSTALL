@@ -1,5 +1,10 @@
+#!/bin/bash
 
 mkdir vep_data
+
+ROOT=/$(pwd -P | cut -d/ -f2)
+
 singularity pull --name vep-102.sif docker://ensemblorg/ensembl-vep:release_102.0
-singularity exec -B /rtsess01 vep-102.sif INSTALL.pl -c $(pwd -P)/vep_data -a cf -s mus_musculus -y GRCm38
+
+singularity exec -B $ROOT vep-102.sif INSTALL.pl -c $(pwd -P)/vep_data -a cf -s mus_musculus -y GRCm38
 
