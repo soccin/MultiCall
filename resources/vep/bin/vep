@@ -1,0 +1,10 @@
+#!/bin/bash
+
+SDIR="$( cd "$( dirname "$0" )" && pwd )"
+
+VEPROOT=$SDIR/..
+VEP_IMAGE=$VEPROOT/vep-102.sif
+VEP_DATA=$VEPROOT/vep_data
+
+singularity exec -B /rtsess01,$VEP_DATA:/data $VEP_IMAGE vep "$@"
+
