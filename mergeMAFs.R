@@ -16,3 +16,4 @@ mafs=map(argv,read_tsv,col_types=cols(.default="c"),comment="#") %>%
         )
 
 saveRDS(mafs,file.path(dirname(argv[1]),"merge.maf.rda"),compress=T)
+write_csv(mafs,file.path(dirname(argv[1]),"merge.maf.csv.gz"))
