@@ -60,8 +60,6 @@ post_strelka.sh \
     > $ODIR/strelka.vcf
 vcf2maf.sh $ODIR/strelka.vcf $NTAG $TTAG #&
 
-exit
-
 normalizeAndTag.sh mutect2 $MUTECT_VCF >$ODIR/mutect2.vcf
 vcf2maf.sh $ODIR/mutect2.vcf $NTAG $TTAG &
 
@@ -75,6 +73,6 @@ vcf2maf.sh $ODIR/freebayes.vcf $NTAG $TTAG
 
 wait
 
-Rscript mergeMAFs.R $ODIR/*.vep.maf
+Rscript $SDIR/mergeMAFs.R $ODIR/*.vep.maf
 
-echo DONE $INPUTCSV
+echo DONE $*
