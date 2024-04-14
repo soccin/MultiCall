@@ -21,7 +21,7 @@ perl $VCF2MAF \
     --ref-fasta $VEPDATA/mus_musculus/102_GRCm38/Mus_musculus.GRCm38.dna.toplevel.fa.gz \
     --species mus_musculus \
     --ncbi-build GRCm38 \
-    --retain-info CALLER,DP \
+    --retain-info CALLER,DP,STATUS \
     --retain-fmt AD \
     --input-vcf $IVCF \
     --output-maf ${IVCF/.vcf/.vep.maf} \
