@@ -9,7 +9,7 @@ TMP=$(mktemp -p .)
 TAG=$1
 IVCF=$2
 
-bedtools intersect -a $IVCF -b $TARGETBED -wa -header \
+tabix -h -R $TARGETBED $IVCF \
     | bcftools norm -m- \
     > $TMP
 
