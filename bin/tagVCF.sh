@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eu
+
 TAG=$1
 TMP=$(mktemp -p .)
 cat /dev/stdin >$TMP
