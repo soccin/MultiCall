@@ -2,9 +2,6 @@
 
 set -eu
 
-module load bcftools/1.19
-module load bedtools/2.31.1
-
 
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
 export PATH=$SDIR/bin:$PATH
