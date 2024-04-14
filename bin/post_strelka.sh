@@ -1,5 +1,9 @@
 #!/bin/bash
 
+set -eu
+
+module load bcftools/1.19
+
 SNVS=$1
 INDELS=$2
 NORMAL=$3
