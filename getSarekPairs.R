@@ -14,7 +14,9 @@ if(len(argv)==1) {
 
 } else if(len(argv)==2) {
 
-    manifest=read_csv(argv[1],progress=F,show_col_types = FALSE) %>% select(patient,sample,status)
+    manifest=read_csv(argv[1],progress=F,show_col_types = FALSE) %>%
+        select(patient,sample,status) %>%
+        distinct
 
     bams=fs::dir_ls(argv[2],recur=T,regex=".recal.cram$")
     bams=tibble(sample=gsub(".recal.(cram)","",basename(bams)),bam=bams)
