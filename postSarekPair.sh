@@ -40,9 +40,12 @@ FREEBAYES_VCF=$VCDIR/freebayes/${TID}_vs_${NID}/*.freebayes.vcf.gz
 STRELKA_SNVS_VCF=$VCDIR/strelka/${TID}_vs_${NID}/*.somatic_snvs.vcf.gz
 STRELKA_INDELS_VCF=$VCDIR/strelka/${TID}_vs_${NID}/*.somatic_indels.vcf.gz
 
-VARDICT_VCF=$VCDIR/vardict/${TID}_vs_${NID}/*.vardict.vcf.gz
+#
+# Vardict output not in out folder as not part of sarek
+# look for it in post folder
+#
 
-
+VARDICT_VCF=post/variant_calling/vardict/${TID}_vs_${NID}/*.vardict.vcf.gz
 
 #
 # Caller specific post process to
