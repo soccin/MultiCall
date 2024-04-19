@@ -92,4 +92,6 @@ fs::dir_create(rDir)
 
 saveWorkbook(wb,file.path(rDir,rFile),overwrite=T)
 
+mFile=cc(projNo,"MergedUnFiltered","MAF.txt")
+write_tsv(maf0,file.path(rDir,mFile))
 
