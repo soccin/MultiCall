@@ -44,40 +44,52 @@ m1=mm %>%
         ) %>%
     ungroup
 
-T_VAF_CUT=0.05
 
-maf0=m1 %>%
+#
+# All Events
+#
+
+maf0=m1 %>% distinct(ETAG,Tumor_Sample_Barcode,.keep_all=T) %>%
+    arrange(Chromosome,Start_Position,Tumor_Sample_Barcode)
+
+#
+# Remove silent events and population events (dbSNP)
+#
+
+maf0f=maf0 %>%
+    filter(!is.na(HGVSp_Short) & !grepl("=$",HGVSp_Short))
+
+
+maf1=maf0f %>%
     filter(t_vaf >= 0.05 & t_alt_count >= 8 & t_depth >= 20 & t_vaf > 5*n_vaf) %>%
-    distinct(ETAG,Tumor_Sample_Barcode,.keep_all=T) %>%
-    filter(!is.na(HGVSp_Short) & !grepl("=$",HGVSp_Short))
+    filter(N.PASS>=1)
 
-maf1=m1 %>%
-    filter(N.PASS>=1) %>%
-    filter(t_vaf >= T_VAF_CUT & t_alt_count >= 8 & t_depth >= 20 & t_vaf > 5*n_vaf) %>%
-    distinct(ETAG,Tumor_Sample_Barcode,.keep_all=T) %>%
-    filter(!is.na(HGVSp_Short) & !grepl("=$",HGVSp_Short))
+maf3=maf1 %>% filter(N.PASS>=2)
 
-mafHC=m1 %>%
-    filter(N.PASS>=2) %>%
-    filter(t_vaf >= T_VAF_CUT & t_alt_count >= 8 & t_depth >= 20 & t_vaf > 5*n_vaf) %>%
-    distinct(ETAG,Tumor_Sample_Barcode,.keep_all=T) %>%
-    filter(!is.na(HGVSp_Short) & !grepl("=$",HGVSp_Short))
+tbl3=maf3 %>%
+    select(Sample=Tumor_Sample_Barcode,Gene=Hugo_Symbol,
+        Type=Variant_Classification,dbSNP=dbSNP_RS,Alteration=HGVSp_Short,
+        MAF=t_vaf,t_depth,t_alt_count,n_depth,n_alt_count,CALLERS,FILTERS)
 
-maf10=m1 %>%
-    filter(N.PASS>=1 & N.CALL>=2) %>%
-    filter(t_vaf >= T_VAF_CUT & t_alt_count >= 8 & t_depth >= 20 & t_vaf > 5*n_vaf) %>%
-    distinct(ETAG,Tumor_Sample_Barcode,.keep_all=T) %>%
-    filter(!is.na(HGVSp_Short) & !grepl("=$",HGVSp_Short))
+class(tbl3$MAF)="percentage"
 
-maf2=m1 %>%
-    filter(N.CALL>=2) %>%
-    filter(t_vaf >= T_VAF_CUT & t_alt_count >= 8 & t_depth >= 20 & t_vaf > 5*n_vaf) %>%
-    distinct(ETAG,Tumor_Sample_Barcode,.keep_all=T) %>%
-    filter(!is.na(HGVSp_Short) & !grepl("=$",HGVSp_Short))
+library(openxlsx)
+wb=createWorkbook()
+addWorksheet(wb,sheetName="HCEvents")
+addWorksheet(wb,sheetName="HighSensMAF")
+writeDataTable(wb,sheet=1,tbl3,tableStyle="none",withFilter=F)
+setColWidths(wb,sheet=1,cols=1:ncol(tbl3),widths="auto")
+writeDataTable(wb,sheet=2,maf1,tableStyle="none",withFilter=F)
 
-maf12=m1 %>%
-    filter(N.CALL>=2 | N.PASS>=1) %>%
-    filter(t_vaf >= T_VAF_CUT & t_alt_count >= 8 & t_depth >= 20 & t_vaf > 5*n_vaf) %>%
-    distinct(ETAG,Tumor_Sample_Barcode,.keep_all=T) %>%
-    filter(!is.na(HGVSp_Short) & !grepl("=$",HGVSp_Short))
+projNo=grep("^Proj",strsplit(getwd(),"/")[[1]],value=T)
+if(len(projNo)==0) {
+    projNo=""
+}
+
+rFile=cc(projNo,"mutationReport","MusVarV1.xlsx")
+rDir="post/reports"
+fs::dir_create(rDir)
+
+saveWorkbook(wb,file.path(rDir,rFile),overwrite=T)
+
 
