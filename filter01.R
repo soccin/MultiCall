@@ -12,7 +12,7 @@ require(tidyverse)
 
 callerOrder=c("mutect2", "freebayes", "strelka", "vardict")
 
-mm=fs::dir_ls("int",rec=T,regex=".rda") %>% map(readRDS) %>% bind_rows %>% type_convert
+mm=fs::dir_ls("post",rec=T,regex=".rda") %>% map(readRDS) %>% bind_rows %>% type_convert
 
 QUAL=mm$vcf_qual
 QUAL=as.numeric(ifelse(QUAL==".",-1,QUAL))
