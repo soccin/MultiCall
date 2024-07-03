@@ -6,7 +6,7 @@ argv=commandArgs(trailing=T)
 
 mafs=map(argv,read_tsv,col_types=cols(.default="c"),comment="#") %>%
   bind_rows %>%
-  type_convert %>%
+  type_convert(locale=locale(grouping_mark="")) %>%
   mutate(Chromosome=factor(Chromosome,levels=c(1:19,"X","Y","MT"))) %>%
   arrange(Chromosome,Start_Position,CALLER) %>%
   mutate(ETAG=paste0(
