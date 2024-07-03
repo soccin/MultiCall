@@ -1,10 +1,16 @@
 #!/bin/bash
 
-mkdir vep_data
-
 ROOT=/$(pwd -P | cut -d/ -f2)
 
-singularity pull --name vep-102.sif docker://ensemblorg/ensembl-vep:release_102.0
+LOCAL_CACHE=/juno/bic/work/socci/depot/Resources/MusVar/multicall/resources/vep
 
-singularity exec -B $ROOT vep-102.sif INSTALL.pl -c $(pwd -P)/vep_data -a cf -s mus_musculus -y GRCm38
+if [ -e "$LOCAL_CACHE/vep-102.sif" ]; then
+    cp -val $LOCAL_CACHE/vep* .
+else
 
+    mkdir -p vep_data
+
+    singularity pull --name vep-102.sif docker://ensemblorg/ensembl-vep:release_102.0
+    singularity exec -B $ROOT vep-102.sif INSTALL.pl -c $(pwd -P)/vep_data -a cf -s mus_musculus -y GRCm38
+
+fi
