@@ -4,7 +4,17 @@ suppressPackageStartupMessages({
 
 argv=commandArgs(trailing=T)
 
-manifest=read_csv(argv[1],progress=F,show_col_types = FALSE) %>%
+manifestCols=cols(
+  patient = col_character(),
+  sample = col_character(),
+  status = col_double(),
+  lane = col_character(),
+  fastq_1 = col_character(),
+  fastq_2 = col_character()
+)
+
+
+manifest=read_csv(argv[1],progress=F,col_types = manifestCols) %>%
     select(patient,sample,status) %>%
     distinct
 
