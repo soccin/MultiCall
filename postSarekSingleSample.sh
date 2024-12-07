@@ -2,18 +2,30 @@
 
 set -eu
 
-SDIR="$( cd "$( dirname "$0" )" && pwd )"
+export SDIR="$( cd "$( dirname "$0" )" && pwd )"
 export PATH=$SDIR/bin:$PATH
 
-TARGET_BED=$SDIR/targets/M-IMPACT_v2_mm10_targets_plus15bp.bed
 
-if [ "$#" != "2" ]; then
-    echo -e "\n\n   usage: postSarekSingleSample.sh OUTPUT_DIRECTORY INPUT_CSV\n\n"
+if [ "$#" != "3" ]; then
+    echo -e "\n\n   usage: postSarekSingleSample.sh TARGETS OUTPUT_DIRECTORY INPUT_CSV\n\n"
     exit
 fi
 
-IDIR=$1
-INPUTCSV=$2
+TARGETS=$1
+if [ ! -e $SDIR/targets/$TARGETS/target.resources.sh ]; then 
+    echo -e "\n\nMissing target resources\n"
+    echo "TARGETS=[${TARGETS}]"
+    exit 1
+fi
+
+#
+# This will (should) set the following variables:
+# - TARGET_BED
+#
+source $SDIR/targets/$TARGETS/target.resources.sh
+
+IDIR=$2
+INPUTCSV=$3
 
 TUMOR=$(extractSamples.py $INPUTCSV tumor)
 NORMAL=$(extractSamples.py $INPUTCSV normal)
@@ -55,13 +67,13 @@ post_strelka.sh \
     > $ODIR/strelka.vcf
 vcf2maf.sh $ODIR/strelka.vcf $NTAG $TTAG &
 
-normalizeAndTag.sh mutect2 $MUTECT_VCF >$ODIR/mutect2.vcf
+normalizeAndTag.sh $TARGET_BED mutect2 $MUTECT_VCF >$ODIR/mutect2.vcf
 vcf2maf.sh $ODIR/mutect2.vcf $NTAG $TTAG &
 
 #
 # For Freebayes remove samples with null calls ".:.:.:."
 #
-normalizeAndTag.sh freebayes $FREEBAYES_VCF \
+normalizeAndTag.sh $TARGET_BED freebayes $FREEBAYES_VCF \
     | fgrep -v ".:.:." \
     >$ODIR/freebayes.vcf
 vcf2maf.sh $ODIR/freebayes.vcf $NTAG $TTAG

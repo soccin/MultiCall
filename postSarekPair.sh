@@ -2,8 +2,7 @@
 
 set -eu
 
-
-SDIR="$( cd "$( dirname "$0" )" && pwd )"
+export SDIR="$( cd "$( dirname "$0" )" && pwd )"
 export PATH=$SDIR/bin:$PATH
 
 VEPVERSION=$(vep --help | fgrep ensembl-vep | awk '{print $3}')
@@ -14,20 +13,30 @@ if [ "$VEPVERSION" != "102.0" ]; then
     exit 1
 fi
 
-
-TARGET_BED=$SDIR/targets/M-IMPACT_v2_mm10_targets_plus15bp.bed
-
-if [ "$#" != "4" ]; then
-    echo -e "\n   usage: postSarekPair.sh VAR_CALL_DIR PID NID TID\n"
+if [ "$#" != "5" ]; then
+    echo -e "\n   usage: postSarekPair.sh TARGETS VAR_CALL_DIR PID NID TID\n"
     echo -e "        VEPVERSION=[${VEPVERSION}]\n\n"
     exit
 fi
 
 
-VCDIR=$(realpath $1)
-PID=$2
-NID=$3
-TID=$4
+TARGETS=$1
+if [ ! -e $SDIR/targets/$TARGETS/target.resources.sh ]; then 
+    echo -e "\n\nMissing target resources\n"
+    echo "TARGETS=[${TARGETS}]"
+    exit 1
+fi
+
+#
+# This will (should) set the following variables:
+# - TARGET_BED
+#
+source $SDIR/targets/$TARGETS/target.resources.sh
+
+VCDIR=$(realpath $2)
+PID=$3
+NID=$4
+TID=$5
 
 # exec >> ${PID}_${NID}.log
 # exec 2>&1
@@ -63,13 +72,13 @@ post_strelka.sh \
     > $ODIR/strelka.vcf
 vcf2maf.sh $ODIR/strelka.vcf $NTAG $TTAG &
 
-normalizeAndTag.sh mutect2 $MUTECT_VCF >$ODIR/mutect2.vcf
+normalizeAndTag.sh $TARGET_BED mutect2 $MUTECT_VCF >$ODIR/mutect2.vcf
 vcf2maf.sh $ODIR/mutect2.vcf $NTAG $TTAG &
 
 #
 # For Freebayes remove samples with null calls ".:.:.:."
 #
-normalizeAndTag.sh freebayes $FREEBAYES_VCF \
+normalizeAndTag.sh $TARGET_BED freebayes $FREEBAYES_VCF \
     | fgrep -v ".:.:." \
     >$ODIR/freebayes.vcf
 vcf2maf.sh $ODIR/freebayes.vcf $NTAG $TTAG &
@@ -79,7 +88,7 @@ vcf2maf.sh $ODIR/freebayes.vcf $NTAG $TTAG &
 #
 if [ -e $VARDICT_VCF ]; then
     echo Processing VARDICT VCF $(basename $VARDICT_VCF)
-    normalizeAndTag.sh vardict $VARDICT_VCF \
+    normalizeAndTag.sh $TARGET_BED vardict $VARDICT_VCF \
         | fgrep -v "<DEL>" \
         >$ODIR/vardict.vcf
     vcf2maf.sh $ODIR/vardict.vcf $NTAG $TTAG
