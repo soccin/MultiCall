@@ -6,12 +6,11 @@ SDIR="$( cd "$( dirname "$0" )" && pwd )"
 
 module load bcftools/1.19
 
-TARGETBED=$SDIR/../targets/M-IMPACT_v2_mm10_targets_plus15bp.bed
-
 TMP=$(mktemp -p .)
 
-TAG=$1
-IVCF=$2
+TARGETBED=$1
+TAG=$2
+IVCF=$3
 
 #
 # - bedtools does not work with VARDICT VCF files (<DEL> events)
