@@ -7,13 +7,13 @@ format_maf<-function(maf) {
         arrange(Tumor_Sample_Barcode,desc(t_vaf),Start_Position)
 }
 
-
 require(tidyverse)
 
 callerOrder=c("mutect2", "freebayes", "strelka", "vardict")
 
 mm=fs::dir_ls("int",rec=T,regex=".rda") %>%
     map(readRDS) %>%
+    map(mutate,PUBMED=as.character(PUBMED)) %>%
     bind_rows %>%
     type_convert(locale=locale(grouping_mark=""))
 
