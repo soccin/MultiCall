@@ -1,6 +1,9 @@
 # MultiCall
 
-## Version: 2.0.1
+## Version: 2.5.1 - branch: `feat/wes`
+
+- Added support for WES data, specifically sample level tables
+- TMB calculation now supports target area input (but only for WES)
 
 Aggregate mutation calls from multiple callers
 
