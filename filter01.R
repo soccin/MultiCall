@@ -76,13 +76,63 @@ tbl3=maf3 %>%
 
 class(tbl3$MAF)="percentage"
 
+#
+# Get sample level table
+#
+
+sTbl=mm %>%
+    distinct(Tumor_Sample_Barcode,Matched_Norm_Sample_Barcode) %>%
+    rename(MatchedNormal=Matched_Norm_Sample_Barcode)
+
+mCounts=maf1 %>%
+    count(Tumor_Sample_Barcode) %>%
+    rename(TotalMutations=n)
+
+tCounts=maf1 %>%
+    count(Tumor_Sample_Barcode,Variant_Type) %>%
+    mutate(Variant_Type=factor(Variant_Type,level=c("SNP","DNP","TNP","ONP","DEL","INS"))) %>%
+    spread(Variant_Type,n,fill=0)
+
+targetArea=list(
+    "Twist_Mouse_Exome_Target_Rev1_7APR20_GRCm38_CLEAN__1000pad.bed"=35.5502
+)
+
+targetName=grep("MusVar/assets/Targets",scan("out/pipeline_info/cmd.sh.log",""),value=T)[1] %>% basename
+
+if(!is.null(targetArea[[targetName]])) {
+    mCounts=mCounts %>%
+        mutate(TMB=TotalMutations/targetArea[[targetName]])
+}
+
+sTbl=left_join(sTbl,mCounts) %>% left_join(tCounts) %>% rename(SampleID=Tumor_Sample_Barcode)
+
 library(openxlsx)
 wb=createWorkbook()
+addWorksheet(wb,sheetName="SampleInfo")
 addWorksheet(wb,sheetName="HCEvents")
 addWorksheet(wb,sheetName="HighSensMAF")
-writeDataTable(wb,sheet=1,tbl3,tableStyle="none",withFilter=F)
-setColWidths(wb,sheet=1,cols=1:ncol(tbl3),widths="auto")
-writeDataTable(wb,sheet=2,maf1,tableStyle="none",withFilter=F)
+
+sheetNo=0
+
+#
+# Sample Level Table
+#
+sheetNo=sheetNo+1
+writeDataTable(wb,sheet=sheetNo,sTbl,tableStyle="none",withFilter=F)
+setColWidths(wb,sheet=sheetNo,cols=1:ncol(sTbl),widths="auto")
+
+#
+# HCEvents
+#
+sheetNo=sheetNo+1
+writeDataTable(wb,sheet=sheetNo,tbl3,tableStyle="none",withFilter=F)
+setColWidths(wb,sheet=sheetNo,cols=1:ncol(tbl3),widths="auto")
+
+#
+# HighSensMAF
+#
+sheetNo=sheetNo+1
+writeDataTable(wb,sheet=sheetNo,maf1,tableStyle="none",withFilter=F)
 
 projNo=grep("^Proj",strsplit(getwd(),"/")[[1]],value=T)
 if(len(projNo)==0) {
