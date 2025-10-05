@@ -54,7 +54,7 @@ STRELKA_INDELS_VCF=$VCDIR/strelka/${TID}_vs_${NID}/*.somatic_indels.vcf.gz
 # look for it in post folder
 #
 
-VARDICT_VCF=post/variant_calling/vardict/${TID}_vs_${NID}/*.vardict.vcf.gz
+VARDICT_VCF=$(find post/variant_calling/vardict -name "${TID}_vs_${NID}*.vardict.vcf.gz")
 
 #
 # Caller specific post process to
